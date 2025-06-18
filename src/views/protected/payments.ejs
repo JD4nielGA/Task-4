@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            border-radius: 10px;
+            margin: 5px 0;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white !important;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .table th {
+            border-top: none;
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        .search-box {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        .btn-export {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+        }
+        .btn-export:hover {
+            background: linear-gradient(45deg, #5a6fd8, #6a4190);
+            color: white;
+        }
+        .payment-row:hover {
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+        .badge-completed {
+            background-color: #28a745;
+        }
+        .badge-pending {
+            background-color: #ffc107;
+            color: #000;
+        }
+        .badge-failed {
+            background-color: #dc3545;
+        }
+        .amount-cell {
+            font-weight: 600;
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white fw-bold">TutorNest</h4>
+                        <small class="text-white-50">Panel de Administración</small>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/protected/dashboard">
+                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/protected/contacts">
+                                <i class="fas fa-address-book me-2"></i>Contactos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/protected/payments">
+                                <i class="fas fa-credit-card me-2"></i>Pagos
+                            </a>
+                        </li>
+                        <% if (user && user.isAdmin) { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/auth/register">
+                                <i class="fas fa-user-plus me-2"></i>Nuevo Usuario
+                            </a>
+                        </li>
+                        <% } %>
+                    </ul>
+                    
+                    <hr class="text-white-50">
+                    
+                    <div class="text-white-50 px-3">
+                        <small>
+                            <i class="fas fa-user me-2"></i><%= user.username %><br>
+                            <% if (user.isAdmin) { %>
+                                <i class="fas fa-crown me-2 text-warning"></i>Administrador
+                            <% } else { %>
+                                <i class="fas fa-user me-2"></i>Usuario
+                            <% } %>
+                        </small>
+                    </div>
+                    
+                    <div class="mt-auto pt-3">
+                        <a href="/auth/logout" class="nav-link text-danger">
+                            <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                        </a>
+                    </div>
+                </div>
+            </nav>
+            
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Gestión de Pagos</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button type="button" class="btn btn-export" onclick="exportPayments()">
+                            <i class="fas fa-download me-2"></i>Exportar CSV
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Search and filters -->
+                <div class="search-box mb-4">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="searchInput" class="form-label">Buscar pagos</label>
+                            <input type="text" class="form-control" id="searchInput" placeholder="ID transacción, email...">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="serviceFilter" class="form-label">Servicio</label>
+                            <select class="form-select" id="serviceFilter">
+                                <option value="">Todos</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="statusFilter" class="form-label">Estado</label>
+                            <select class="form-select" id="statusFilter">
+                                <option value="">Todos</option>
+                                <option value="completed">Completado</option>
+                                <option value="pending">Pendiente</option>
+                                <option value="failed">Fallido</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="dateFromFilter" class="form-label">Desde</label>
+                            <input type="date" class="form-control" id="dateFromFilter">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="dateToFilter" class="form-label">Hasta</label>
+                            <input type="date" class="form-control" id="dateToFilter">
+                        </div>
+                        <div class="col-md-1 d-flex align-items-end">
+                            <button type="button" class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary" id="totalPayments">0</h5>
+                                <p class="card-text">Total Pagos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title text-success" id="totalAmount">$0</h5>
+                                <p class="card-text">Monto Total</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title text-info" id="completedPayments">0</h5>
+                                <p class="card-text">Completados</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title text-warning" id="pendingPayments">0</h5>
+                                <p class="card-text">Pendientes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Payments table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Lista de Pagos</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="paymentsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>ID Transacción</th>
+                                        <th>Servicio</th>
+                                        <th>Monto</th>
+                                        <th>Estado</th>
+                                        <th>Email</th>
+                                        <th>Detalles</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="paymentsTableBody">
+                                    <!-- Payments will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div id="loadingSpinner" class="text-center py-4" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                        
+                        <div id="noResults" class="text-center py-4" style="display: none;">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No se encontraron pagos</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- Payment Details Modal -->
+    <div class="modal fade" id="paymentDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalles del Pago</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="paymentDetailsBody">
+                    <!-- Payment details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let allPayments = [];
+        let filteredPayments = [];
+        
+        // Load payments on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadPayments();
+            setupEventListeners();
+        });
+        
+        function setupEventListeners() {
+            document.getElementById('searchInput').addEventListener('input', filterPayments);
+            document.getElementById('serviceFilter').addEventListener('change', filterPayments);
+            document.getElementById('statusFilter').addEventListener('change', filterPayments);
+            document.getElementById('dateFromFilter').addEventListener('change', filterPayments);
+            document.getElementById('dateToFilter').addEventListener('change', filterPayments);
+        }
+        
+        async function loadPayments() {
+            showLoading(true);
+            try {
+                const response = await fetch('/protected/api/payments');
+                const data = await response.json();
+                
+                if (data.success) {
+                    allPayments = data.payments;
+                    filteredPayments = [...allPayments];
+                    populateServiceFilter();
+                    displayPayments();
+                    updateStatistics();
+                } else {
+                    console.error('Error loading payments:', data.message);
+                }
+            } catch (error) {
+                console.error('Error loading payments:', error);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function populateServiceFilter() {
+            const services = [...new Set(allPayments.map(payment => payment.service).filter(Boolean))];
+            const serviceSelect = document.getElementById('serviceFilter');
+            
+            services.forEach(service => {
+                const option = document.createElement('option');
+                option.value = service;
+                option.textContent = service;
+                serviceSelect.appendChild(option);
+            });
+        }
+        
+        function filterPayments() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const serviceFilter = document.getElementById('serviceFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFromFilter = document.getElementById('dateFromFilter').value;
+            const dateToFilter = document.getElementById('dateToFilter').value;
+            
+            filteredPayments = allPayments.filter(payment => {
+                const paymentDetails = JSON.parse(payment.details || '{}');
+                
+                const matchesSearch = !searchTerm || 
+                    (paymentDetails.transactionId && paymentDetails.transactionId.toLowerCase().includes(searchTerm)) ||
+                    (paymentDetails.email && paymentDetails.email.toLowerCase().includes(searchTerm)) ||
+                    payment.service.toLowerCase().includes(searchTerm);
+                
+                const matchesService = !serviceFilter || payment.service === serviceFilter;
+                const matchesStatus = !statusFilter || payment.status === statusFilter;
+                
+                const paymentDate = new Date(payment.created_at).toDateString();
+                const matchesDateFrom = !dateFromFilter || new Date(paymentDate) >= new Date(dateFromFilter);
+                const matchesDateTo = !dateToFilter || new Date(paymentDate) <= new Date(dateToFilter);
+                
+                return matchesSearch && matchesService && matchesStatus && matchesDateFrom && matchesDateTo;
+            });
+            
+            displayPayments();
+            updateStatistics();
+        }
+        
+        function displayPayments() {
+            const tbody = document.getElementById('paymentsTableBody');
+            const noResults = document.getElementById('noResults');
+            
+            if (filteredPayments.length === 0) {
+                tbody.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
+            tbody.innerHTML = filteredPayments.map(payment => {
+                const details = JSON.parse(payment.payment_data || '{}');
+                const statusBadge = getStatusBadge(payment.status);
+                
+                return `
+                    <tr class="payment-row" onclick="showPaymentDetails(${payment.id})">
+                        <td>${new Date(payment.created_at).toLocaleDateString('es-ES')}</td>
+                        <td><small class="text-muted">${details.transactionId || 'N/A'}</small></td>
+                        <td>${payment.service}</td>
+                        <td class="amount-cell">$${payment.amount.toFixed(2)}</td>
+                        <td>${statusBadge}</td>
+                        <td>${details.email || 'N/A'}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary" onclick="event.stopPropagation(); showPaymentDetails(${payment.id})">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+        
+        function getStatusBadge(status) {
+            const badges = {
+                'completed': '<span class="badge badge-completed">Completado</span>',
+                'pending': '<span class="badge badge-pending">Pendiente</span>',
+                'failed': '<span class="badge badge-failed">Fallido</span>'
+            };
+            return badges[status] || `<span class="badge bg-secondary">${status}</span>`;
+        }
+        
+        function updateStatistics() {
+            const total = filteredPayments.length;
+            const totalAmount = filteredPayments.reduce((sum, payment) => sum + payment.amount, 0);
+            const completed = filteredPayments.filter(p => p.status === 'completed').length;
+            const pending = filteredPayments.filter(p => p.status === 'pending').length;
+            
+            document.getElementById('totalPayments').textContent = total;
+            document.getElementById('totalAmount').textContent = `$${totalAmount.toFixed(2)}`;
+            document.getElementById('completedPayments').textContent = completed;
+            document.getElementById('pendingPayments').textContent = pending;
+        }
+        
+        function showPaymentDetails(paymentId) {
+            const payment = allPayments.find(p => p.id === paymentId);
+            if (!payment) return;
+            
+            const details = JSON.parse(payment.payment_data || '{}');
+            const modal = new bootstrap.Modal(document.getElementById('paymentDetailsModal'));
+            
+            document.getElementById('paymentDetailsBody').innerHTML = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Información del Pago</h6>
+                        <table class="table table-sm">
+                            <tr><td><strong>ID:</strong></td><td>${payment.id}</td></tr>
+                            <tr><td><strong>Servicio:</strong></td><td>${payment.service}</td></tr>
+                            <tr><td><strong>Monto:</strong></td><td>$${payment.amount.toFixed(2)}</td></tr>
+                            <tr><td><strong>Estado:</strong></td><td>${getStatusBadge(payment.status)}</td></tr>
+                            <tr><td><strong>Fecha:</strong></td><td>${new Date(payment.created_at).toLocaleString('es-ES')}</td></tr>
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Detalles Adicionales</h6>
+                        <table class="table table-sm">
+                            <tr><td><strong>ID Transacción:</strong></td><td>${details.transactionId || 'N/A'}</td></tr>
+                            <tr><td><strong>Email:</strong></td><td>${details.email || 'N/A'}</td></tr>
+                            <tr><td><strong>Moneda:</strong></td><td>${details.currency || 'N/A'}</td></tr>
+                            <tr><td><strong>Descripción:</strong></td><td>${details.description || 'N/A'}</td></tr>
+                            <tr><td><strong>Referencia:</strong></td><td>${details.reference || 'N/A'}</td></tr>
+                            <tr><td><strong>Titular:</strong></td><td>${details.cardholderName || 'N/A'}</td></tr>
+                        </table>
+                    </div>
+                </div>
+                ${details.error ? `
+                    <div class="row mt-3">
+                        <div class="col-12">
+                            <h6 class="text-danger">Error</h6>
+                            <div class="alert alert-danger">${details.error}</div>
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+            
+            modal.show();
+        }
+        
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('serviceFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('dateFromFilter').value = '';
+            document.getElementById('dateToFilter').value = '';
+            filteredPayments = [...allPayments];
+            displayPayments();
+            updateStatistics();
+        }
+        
+        function exportPayments() {
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                "Fecha,ID Transacción,Servicio,Monto,Estado,Email,Descripción\n" +
+                filteredPayments.map(payment => {
+                    const details = JSON.parse(payment.details || '{}');
+                    return `"${new Date(payment.created_at).toLocaleDateString('es-ES')}","${details.transactionId || ''}","${payment.service}","${payment.amount}","${payment.status}","${details.email || ''}","${details.description || ''}"`;
+                }).join("\n");
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `pagos_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>

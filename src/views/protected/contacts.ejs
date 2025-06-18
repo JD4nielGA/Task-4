@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            min-height: 100vh;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+        }
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+            border-radius: 10px;
+            margin: 5px 0;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white !important;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .table th {
+            border-top: none;
+            background-color: #f8f9fa;
+            font-weight: 600;
+        }
+        .search-box {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+        }
+        .btn-export {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+        }
+        .btn-export:hover {
+            background: linear-gradient(45deg, #5a6fd8, #6a4190);
+            color: white;
+        }
+        .contact-row:hover {
+            background-color: #f8f9fa;
+            cursor: pointer;
+        }
+        .badge-country {
+            font-size: 0.8em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
+                <div class="position-sticky pt-3">
+                    <div class="text-center mb-4">
+                        <h4 class="text-white fw-bold">TutorNest</h4>
+                        <small class="text-white-50">Panel de Administración</small>
+                    </div>
+                    
+                    <ul class="nav flex-column">
+                        <li class="nav-item">
+                            <a class="nav-link" href="/protected/dashboard">
+                                <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="/protected/contacts">
+                                <i class="fas fa-address-book me-2"></i>Contactos
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/protected/payments">
+                                <i class="fas fa-credit-card me-2"></i>Pagos
+                            </a>
+                        </li>
+                        <% if (user && user.isAdmin) { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/auth/register">
+                                <i class="fas fa-user-plus me-2"></i>Nuevo Usuario
+                            </a>
+                        </li>
+                        <% } %>
+                    </ul>
+                    
+                    <hr class="text-white-50">
+                    
+                    <div class="text-white-50 px-3">
+                        <small>
+                            <i class="fas fa-user me-2"></i><%= user.username %><br>
+                            <% if (user.isAdmin) { %>
+                                <i class="fas fa-crown me-2 text-warning"></i>Administrador
+                            <% } else { %>
+                                <i class="fas fa-user me-2"></i>Usuario
+                            <% } %>
+                        </small>
+                    </div>
+                    
+                    <div class="mt-auto pt-3">
+                        <a href="/auth/logout" class="nav-link text-danger">
+                            <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                        </a>
+                    </div>
+                </div>
+            </nav>
+            
+            <!-- Main content -->
+            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+                <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                    <h1 class="h2">Gestión de Contactos</h1>
+                    <div class="btn-toolbar mb-2 mb-md-0">
+                        <button type="button" class="btn btn-export" onclick="exportContacts()">
+                            <i class="fas fa-download me-2"></i>Exportar CSV
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Search and filters -->
+                <div class="search-box mb-4">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <label for="searchInput" class="form-label">Buscar contactos</label>
+                            <input type="text" class="form-control" id="searchInput" placeholder="Nombre, email o comentario...">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="countryFilter" class="form-label">País</label>
+                            <select class="form-select" id="countryFilter">
+                                <option value="">Todos los países</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label for="dateFilter" class="form-label">Fecha</label>
+                            <input type="date" class="form-control" id="dateFilter">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <button type="button" class="btn btn-outline-secondary w-100" onclick="clearFilters()">
+                                <i class="fas fa-times me-2"></i>Limpiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Statistics -->
+                <div class="row mb-4">
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary" id="totalContacts">0</h5>
+                                <p class="card-text">Total Contactos</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title text-success" id="todayContacts">0</h5>
+                                <p class="card-text">Hoy</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title text-info" id="weekContacts">0</h5>
+                                <p class="card-text">Esta Semana</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <h5 class="card-title text-warning" id="monthContacts">0</h5>
+                                <p class="card-text">Este Mes</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Contacts table -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">Lista de Contactos</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="contactsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Nombre</th>
+                                        <th>Email</th>
+                                        <th>País</th>
+                                        <th>Comentario</th>
+                                        <th>IP</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="contactsTableBody">
+                                    <!-- Contacts will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div id="loadingSpinner" class="text-center py-4" style="display: none;">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                        
+                        <div id="noResults" class="text-center py-4" style="display: none;">
+                            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">No se encontraron contactos</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let allContacts = [];
+        let filteredContacts = [];
+        
+        // Load contacts on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadContacts();
+            setupEventListeners();
+        });
+        
+        function setupEventListeners() {
+            document.getElementById('searchInput').addEventListener('input', filterContacts);
+            document.getElementById('countryFilter').addEventListener('change', filterContacts);
+            document.getElementById('dateFilter').addEventListener('change', filterContacts);
+        }
+        
+        async function loadContacts() {
+            showLoading(true);
+            try {
+                const response = await fetch('/protected/api/contacts');
+                const data = await response.json();
+                
+                if (data.success) {
+                    allContacts = data.contacts;
+                    filteredContacts = [...allContacts];
+                    populateCountryFilter();
+                    displayContacts();
+                    updateStatistics();
+                } else {
+                    console.error('Error loading contacts:', data.message);
+                }
+            } catch (error) {
+                console.error('Error loading contacts:', error);
+            } finally {
+                showLoading(false);
+            }
+        }
+        
+        function populateCountryFilter() {
+            const countries = [...new Set(allContacts.map(contact => contact.country).filter(Boolean))];
+            const countrySelect = document.getElementById('countryFilter');
+            
+            countries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = country;
+                countrySelect.appendChild(option);
+            });
+        }
+        
+        function filterContacts() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const countryFilter = document.getElementById('countryFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+            
+            filteredContacts = allContacts.filter(contact => {
+                const matchesSearch = !searchTerm || 
+                    contact.name.toLowerCase().includes(searchTerm) ||
+                    contact.email.toLowerCase().includes(searchTerm) ||
+                    contact.comment.toLowerCase().includes(searchTerm);
+                
+                const matchesCountry = !countryFilter || contact.country === countryFilter;
+                
+                const matchesDate = !dateFilter || 
+                    new Date(contact.created_at).toDateString() === new Date(dateFilter).toDateString();
+                
+                return matchesSearch && matchesCountry && matchesDate;
+            });
+            
+            displayContacts();
+        }
+        
+        function displayContacts() {
+            const tbody = document.getElementById('contactsTableBody');
+            const noResults = document.getElementById('noResults');
+            
+            if (filteredContacts.length === 0) {
+                tbody.innerHTML = '';
+                noResults.style.display = 'block';
+                return;
+            }
+            
+            noResults.style.display = 'none';
+            
+            tbody.innerHTML = filteredContacts.map(contact => `
+                <tr class="contact-row" onclick="showContactDetails(${contact.id})">
+                    <td>${new Date(contact.created_at).toLocaleDateString('es-ES')}</td>
+                    <td>${contact.name}</td>
+                    <td>${contact.email}</td>
+                    <td>
+                        ${contact.country ? `<span class="badge bg-secondary badge-country">${contact.country}</span>` : '-'}
+                    </td>
+                    <td>${contact.comment.length > 50 ? contact.comment.substring(0, 50) + '...' : contact.comment}</td>
+                    <td><small class="text-muted">${contact.ip_address}</small></td>
+                </tr>
+            `).join('');
+        }
+        
+        function updateStatistics() {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+            const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+            
+            const todayCount = allContacts.filter(contact => 
+                new Date(contact.created_at) >= today
+            ).length;
+            
+            const weekCount = allContacts.filter(contact => 
+                new Date(contact.created_at) >= weekAgo
+            ).length;
+            
+            const monthCount = allContacts.filter(contact => 
+                new Date(contact.created_at) >= monthAgo
+            ).length;
+            
+            document.getElementById('totalContacts').textContent = allContacts.length;
+            document.getElementById('todayContacts').textContent = todayCount;
+            document.getElementById('weekContacts').textContent = weekCount;
+            document.getElementById('monthContacts').textContent = monthCount;
+        }
+        
+        function showContactDetails(contactId) {
+            const contact = allContacts.find(c => c.id === contactId);
+            if (!contact) return;
+            
+            alert(`Detalles del Contacto:\n\nNombre: ${contact.name}\nEmail: ${contact.email}\nPaís: ${contact.country || 'No especificado'}\nIP: ${contact.ip_address}\nFecha: ${new Date(contact.created_at).toLocaleString('es-ES')}\n\nComentario:\n${contact.comment}`);
+        }
+        
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('countryFilter').value = '';
+            document.getElementById('dateFilter').value = '';
+            filteredContacts = [...allContacts];
+            displayContacts();
+        }
+        
+        function exportContacts() {
+            const csvContent = "data:text/csv;charset=utf-8," + 
+                "Fecha,Nombre,Email,País,IP,Comentario\n" +
+                filteredContacts.map(contact => 
+                    `"${new Date(contact.created_at).toLocaleDateString('es-ES')}","${contact.name}","${contact.email}","${contact.country || ''}","${contact.ip_address}","${contact.comment.replace(/"/g, '""')}"`
+                ).join("\n");
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `contactos_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+        
+        function showLoading(show) {
+            document.getElementById('loadingSpinner').style.display = show ? 'block' : 'none';
+        }
+    </script>
+</body>
+</html>

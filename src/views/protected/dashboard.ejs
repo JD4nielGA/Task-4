@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            margin: 2px 0;
+        }
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .stat-card-success {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            color: white;
+        }
+        .stat-card-warning {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+        .stat-card-info {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 px-0">
+                <div class="sidebar p-3">
+                    <div class="text-center mb-4">
+                        <h4 class="fw-bold">TutorNest</h4>
+                        <p class="mb-0">Panel Administrativo</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <small class="text-light opacity-75">Bienvenido, <%= user ? user.username : 'Admin' %></small>
+                    </div>
+
+                    <nav class="nav flex-column">
+                        <a class="nav-link active" href="/protected/dashboard">
+                            <i class="fas fa-tachometer-alt me-2"></i>Dashboard
+                        </a>
+                        <a class="nav-link" href="/protected/contacts">
+                            <i class="fas fa-address-book me-2"></i>Contactos
+                        </a>
+                        <a class="nav-link" href="/protected/payments">
+                            <i class="fas fa-credit-card me-2"></i>Pagos
+                        </a>
+                        <% if (user && user.isAdmin) { %>
+                        <a class="nav-link" href="/auth/register">
+                            <i class="fas fa-user-plus me-2"></i>Nuevo Usuario
+                        </a>
+                        <% } %>
+                        <hr class="my-3">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home me-2"></i>Sitio Web
+                        </a>
+                        <a class="nav-link" href="/auth/logout">
+                            <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                        </a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10">
+                <div class="p-4">
+                    <!-- Header -->
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="h3 mb-0">Panel de Control</h1>
+                        <div class="text-muted">
+                            <i class="fas fa-calendar me-2"></i>
+                            <%= new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %>
+                        </div>
+                    </div>
+
+                    <!-- Alert Messages -->
+                    <% if (message) { %>
+                        <div class="alert alert-<%= success ? 'success' : 'danger' %> alert-dismissible fade show" role="alert">
+                            <%= message %>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    <% } %>
+
+                    <!-- Statistics Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card stat-card">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-address-book fa-2x mb-3"></i>
+                                    <h3 class="mb-1"><%= stats.totalContacts %></h3>
+                                    <p class="mb-0">Total Contactos</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card stat-card-success">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-credit-card fa-2x mb-3"></i>
+                                    <h3 class="mb-1"><%= stats.totalPayments %></h3>
+                                    <p class="mb-0">Total Pagos</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card stat-card-warning">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-clock fa-2x mb-3"></i>
+                                    <h3 class="mb-1"><%= stats.recentContacts.length %></h3>
+                                    <p class="mb-0">Contactos Recientes</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-3 mb-3">
+                            <div class="card stat-card-info">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-chart-line fa-2x mb-3"></i>
+                                    <h3 class="mb-1"><%= stats.recentPayments.length %></h3>
+                                    <p class="mb-0">Pagos Recientes</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="row">
+                        <!-- Recent Contacts -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-address-book me-2"></i>Contactos Recientes
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <% if (stats.recentContacts.length > 0) { %>
+                                        <% stats.recentContacts.forEach(contact => { %>
+                                            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                                                <div>
+                                                    <strong><%= contact.name %></strong><br>
+                                                    <small class="text-muted"><%= contact.email %></small>
+                                                </div>
+                                                <small class="text-muted">
+                                                    <%= new Date(contact.created_at).toLocaleDateString('es-ES') %>
+                                                </small>
+                                            </div>
+                                        <% }); %>
+                                        <div class="text-center mt-3">
+                                            <a href="/protected/contacts" class="btn btn-outline-primary btn-sm">
+                                                Ver todos los contactos
+                                            </a>
+                                        </div>
+                                    <% } else { %>
+                                        <p class="text-muted text-center">No hay contactos registrados</p>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Payments -->
+                        <div class="col-lg-6 mb-4">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-credit-card me-2"></i>Pagos Recientes
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <% if (stats.recentPayments.length > 0) { %>
+                                        <% stats.recentPayments.forEach(payment => { %>
+                                            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                                                <div>
+                                                    <strong><%= payment.name %></strong><br>
+                                                    <small class="text-muted"><%= payment.email %></small>
+                                                </div>
+                                                <div class="text-end">
+                                                    <strong class="text-success">$<%= payment.amount %></strong><br>
+                                                    <small class="text-muted">
+                                                        <%= new Date(payment.created_at).toLocaleDateString('es-ES') %>
+                                                    </small>
+                                                </div>
+                                            </div>
+                                        <% }); %>
+                                        <div class="text-center mt-3">
+                                            <a href="/protected/payments" class="btn btn-outline-success btn-sm">
+                                                Ver todos los pagos
+                                            </a>
+                                        </div>
+                                    <% } else { %>
+                                        <p class="text-muted text-center">No hay pagos registrados</p>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">
+                                        <i class="fas fa-bolt me-2"></i>Acciones Rápidas
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4 mb-2">
+                                            <a href="/protected/contacts" class="btn btn-outline-primary w-100">
+                                                <i class="fas fa-address-book me-2"></i>Gestionar Contactos
+                                            </a>
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <a href="/protected/payments" class="btn btn-outline-success w-100">
+                                                <i class="fas fa-credit-card me-2"></i>Gestionar Pagos
+                                            </a>
+                                        </div>
+                                        <div class="col-md-4 mb-2">
+                                            <a href="/auth/register" class="btn btn-outline-info w-100">
+                                                <i class="fas fa-user-plus me-2"></i>Crear Usuario
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

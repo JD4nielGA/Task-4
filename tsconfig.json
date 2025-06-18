@@ -1,0 +1,24 @@
+{
+    "compilerOptions": {
+      "target": "ES2017",
+      "module": "commonjs",
+      "outDir": "./dist",
+      "rootDir": "./src",
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "forceConsistentCasingInFileNames": true,
+      "moduleResolution": "node",
+      "baseUrl": ".",
+      "paths": {
+        "*": ["node_modules/*"]
+      }
+    },
+    "lib": [
+      "ES2017",
+      "ESNext.AsyncIterable",
+      "node"
+    ],
+    "include": ["src/**/*"],
+    "exclude": ["node_modules"]
+  }

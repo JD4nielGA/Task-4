@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="<%= title %> - Tutorías Escolares y Universitarias">
+    <meta property="og:description" content="Tutorías personalizadas en diversas materias, adaptadas a tus necesidades. Aprende a tu ritmo con la ayuda de expertos.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<%= typeof url !== 'undefined' ? url : 'https://tutornest.com' %>">
+    <meta property="og:image" content="<%= typeof url !== 'undefined' ? url : 'https://tutornest.com' %>/images/og-image.jpg">
+    <meta property="og:site_name" content="TutorNest">
+    <meta property="og:locale" content="es_ES">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= title %> - Tutorías Escolares y Universitarias">
+    <meta name="twitter:description" content="Tutorías personalizadas en diversas materias, adaptadas a tus necesidades. Aprende a tu ritmo con la ayuda de expertos.">
+    <meta name="twitter:image" content="<%= typeof url !== 'undefined' ? url : 'https://tutornest.com' %>/images/og-image.jpg">
+    
+    <!-- Additional Meta Tags -->
+    <meta name="description" content="Tutorías personalizadas en diversas materias, adaptadas a tus necesidades. Aprende a tu ritmo con la ayuda de expertos.">
+    <meta name="keywords" content="tutorías, clases particulares, educación, aprendizaje, matemáticas, ciencias, idiomas">
+    <meta name="author" content="TutorNest">
+    
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <%- include('partials/analytics') %>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/stylesheets/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+        .form-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .btn-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-gradient:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .section-title {
+            color: #495057;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 1.5rem;
+        }
+        .navbar-custom {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+        }
+        .example-data {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 4px solid #667eea;
+        }
+        .example-data h6 {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .example-data small {
+            color: #6c757d;
+        }
+    </style>
+
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="fas fa-graduation-cap me-2" style="color: #667eea;"></i>
+                TutorNest
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#descripcion">Servicios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#beneficios">Beneficios</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contacto">Contacto</a>
+                    </li>
+                    <% if (showPaymentForm) { %>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#payment">Pago</a>
+                    </li>
+                    <% } %>
+                </ul>
+                <ul class="navbar-nav">
+                    <% if (typeof user !== 'undefined' && user) { %>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user me-1"></i> <%= user.username %>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/protected/contacts">
+                                    <i class="fas fa-tachometer-alt me-2"></i>Panel
+                                </a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/auth/logout">
+                                    <i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión
+                                </a></li>
+                            </ul>
+                        </li>
+                    <% } else { %>
+                        <li class="nav-item">
+                            <a class="nav-link" href="/auth/login">
+                                <i class="fas fa-sign-in-alt me-1"></i> Iniciar Sesión
+                            </a>
+                        </li>
+                    <% } %>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold mb-4"><%= title %></h1>
+                    <p class="lead mb-4">Tutorías escolares y universitarias para potenciar tu aprendizaje con metodologías innovadoras y profesores expertos.</p>
+                    <a href="#contacto" class="btn btn-light btn-lg me-3">
+                        <i class="fas fa-envelope me-2"></i>Contáctanos
+                    </a>
+                    <% if (showPaymentForm) { %>
+                    <a href="#payment" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-credit-card me-2"></i>Realizar Pago
+                    </a>
+                    <% } %>
+                </div>
+                <div class="col-lg-6 text-center">
+                    <i class="fas fa-chalkboard-teacher" style="font-size: 8rem; opacity: 0.3;"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<main style="padding-top: 100px;">
+    <div class="container">
+        <!-- Alert Messages -->
+        <% if (message) { %>
+            <div class="alert alert-<%= success ? 'success' : 'danger' %> alert-dismissible fade show" role="alert">
+                <i class="fas fa-<%= success ? 'check-circle' : 'exclamation-triangle' %> me-2"></i>
+                <%= message %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+        <% if (paymentMessage) { %>
+            <div class="alert alert-<%= paymentSuccess ? 'success' : 'danger' %> alert-dismissible fade show" role="alert">
+                <i class="fas fa-<%= paymentSuccess ? 'check-circle' : 'exclamation-triangle' %> me-2"></i>
+                <%= paymentMessage %>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+        <!-- Services Section -->
+        <section id="descripcion" class="py-5">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h2 class="section-title">Nuestros Servicios</h2>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-8 mx-auto">
+                    <div class="card">
+                        <div class="card-body text-center p-5">
+                            <div class="feature-icon">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <h4 class="card-title mb-3">Tutorías Personalizadas</h4>
+                            <p class="card-text lead">Ofrecemos tutorías personalizadas en diversas materias, adaptadas a tus necesidades específicas. Aprende a tu ritmo con la ayuda de expertos calificados y metodologías innovadoras.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Benefits Section -->
+        <section id="beneficios" class="py-5 bg-light">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h2 class="section-title">Beneficios y Ventajas</h2>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="feature-icon">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <h5 class="card-title">Atención Personalizada</h5>
+                            <p class="card-text">Cada estudiante recibe un plan de estudio adaptado a sus necesidades y ritmo de aprendizaje.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="feature-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <h5 class="card-title">Flexibilidad de Horarios</h5>
+                            <p class="card-text">Horarios flexibles que se adaptan a tu disponibilidad y estilo de vida.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <div class="feature-icon">
+                                <i class="fas fa-graduation-cap"></i>
+                            </div>
+                            <h5 class="card-title">Apoyo Integral</h5>
+                            <p class="card-text">Cobertura completa en temas escolares y universitarios con profesores especializados.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Gallery Section -->
+        <section id="imagenes" class="py-5">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h2 class="section-title">Nuestro Ambiente de Aprendizaje</h2>
+                </div>
+            </div>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <img src="https://images.pexels.com/photos/5306492/pexels-photo-5306492.jpeg?cs=srgb&dl=pexels-shkrabaanthony-5306492.jpg&fm=jpg" class="card-img-top" alt="Tutoría presencial" style="height: 250px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">Tutorías Presenciales</h5>
+                            <p class="card-text">Interacción directa con nuestros profesores en un ambiente cómodo y profesional.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <img src="https://images.pexels.com/photos/4145153/pexels-photo-4145153.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" class="card-img-top" alt="Tutoría virtual" style="height: 250px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">Tutorías Virtuales</h5>
+                            <p class="card-text">Clases online con tecnología de vanguardia para aprender desde cualquier lugar.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <img src="https://images.pexels.com/photos/1326946/pexels-photo-1326946.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" class="card-img-top" alt="Estudiante concentrado" style="height: 250px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">Estudio Personalizado</h5>
+                            <p class="card-text">Metodologías adaptadas a cada estudiante para maximizar el aprendizaje.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <img src="https://images.pexels.com/photos/5212700/pexels-photo-5212700.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" class="card-img-top" alt="Ambiente de aprendizaje" style="height: 250px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">Ambiente Colaborativo</h5>
+                            <p class="card-text">Espacios diseñados para fomentar la colaboración y el intercambio de ideas.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contacto" class="py-5 bg-light">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h2 class="section-title">Contáctanos</h2>
+                    <p class="lead mb-5">¿Tienes alguna pregunta? Estamos aquí para ayudarte. Completa el formulario y nos pondremos en contacto contigo.</p>
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="form-card">
+                        <form id="contacto-form" action="/contact/add" method="POST">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label">
+                                        <i class="fas fa-envelope me-2"></i>Correo Electrónico
+                                    </label>
+                                    <input type="email" class="form-control" name="email" id="email" maxlength="254" minlength="6" placeholder="tu@email.com" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="name" class="form-label">
+                                        <i class="fas fa-user me-2"></i>Nombre Completo
+                                    </label>
+                                    <input type="text" class="form-control" name="name" id="name" maxlength="100" minlength="6" placeholder="Tu nombre completo" required>
+                                </div>
+                                <div class="col-12">
+                                    <label for="comment" class="form-label">
+                                        <i class="fas fa-comment me-2"></i>Mensaje
+                                    </label>
+                                    <textarea class="form-control" rows="5" name="comment" id="comment" minlength="10" maxlength="500" placeholder="Cuéntanos en qué podemos ayudarte..." required></textarea>
+                                </div>
+                                <div class="col-12 text-center">
+                                    <div class="g-recaptcha" id="g-recaptcha" name="recaptcha" data-sitekey="<%= grKey %>"></div>
+                                </div>
+                                <div class="col-12 text-center">
+                                    <button type="submit" class="btn btn-gradient btn-lg">
+                                        <i class="fas fa-paper-plane me-2"></i>Enviar Mensaje
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Payment Section -->
+        <% if (showPaymentForm) { %>
+        <section id="payment" class="py-5">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h2 class="section-title">Realizar Pago</h2>
+                    <p class="lead mb-5">¿Listo para comenzar tu experiencia de aprendizaje? Completa el formulario de pago de forma segura.</p>
+                </div>
+            </div>
+            
+            <!-- Example Data Section -->
+            <div class="row justify-content-center mb-4">
+                <div class="col-lg-10">
+                    <div class="example-data">
+                        <h6><i class="fas fa-info-circle me-2"></i>Números de Tarjeta Válidos (API fakepayment)</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <small><strong>Tarjetas de Prueba:</strong></small><br>
+                                <small>• Visa: 4111111111111111</small><br>
+                                <small>• Mastercard: 5555555555554444</small><br>
+                                <small>• American Express: 378282246310005</small>
+                            </div>
+                            <div class="col-md-6">
+                                <small><strong>Otros Datos:</strong></small><br>
+                                <small>• CVV: 123 (cualquier número de 3-4 dígitos)</small><br>
+                                <small>• Fecha: Cualquier fecha futura</small><br>
+                                <small>• Nombre: APPROVED (aprueba) | REJECTED (rechaza) | ERROR (error) | INSUFFICIENT (fondos insuficientes)</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <div class="form-card">
+                        <form action="/payment/add" method="POST" id="payment-form">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label for="service" class="form-label">
+                                        <i class="fas fa-graduation-cap me-2"></i>Servicio de Pago
+                                    </label>
+                                    <select class="form-select" name="service" id="service" required>
+                                        <% paymentServices.forEach(service => { %>
+                                            <option value="<%= service %>"><%= service %></option>
+                                        <% }); %>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="payment-email" class="form-label">
+                                        <i class="fas fa-envelope me-2"></i>Email
+                                    </label>
+                                    <input type="email" class="form-control" name="email" id="payment-email" maxlength="254" minlength="6" placeholder="test@example.com" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="cardholderName" class="form-label">
+                                        <i class="fas fa-user me-2"></i>Nombre del Titular
+                                    </label>
+                                    <input type="text" class="form-control" name="cardholderName" id="cardholderName" maxlength="100" minlength="2" placeholder="Juan Pérez" required>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="cardNumber" class="form-label">
+                                        <i class="fas fa-credit-card me-2"></i>Número de Tarjeta
+                                    </label>
+                                    <input type="text" class="form-control" name="cardNumber" id="cardNumber" pattern="[\d\s]{13,23}" maxlength="23" minlength="13" placeholder="4111 1111 1111 1111" required>
+                                    <div class="form-text">Usa las tarjetas de prueba mostradas arriba</div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">
+                                        <i class="fas fa-calendar me-2"></i>Mes de Expiración
+                                    </label>
+                                    <select class="form-select" name="expMonth" required>
+                                        <option value="">Mes</option>
+                                        <% for(let i=1; i<=12; i++) { %>
+                                            <option value="<%= i %>" <%= i === 12 ? 'selected' : '' %>><%= String(i).padStart(2, '0') %></option>
+                                        <% } %>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label class="form-label">
+                                        <i class="fas fa-calendar me-2"></i>Año de Expiración
+                                    </label>
+                                    <select class="form-select" name="expYear" required>
+                                        <option value="">Año</option>
+                                        <% const currentYear = new Date().getFullYear();
+                                           for(let i=0; i<10; i++) { %>
+                                            <option value="<%= currentYear + i %>" <%= i === 2 ? 'selected' : '' %>><%= currentYear + i %></option>
+                                        <% } %>
+                                    </select>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label for="cvv" class="form-label">
+                                        <i class="fas fa-lock me-2"></i>CVV/CVC
+                                    </label>
+                                    <input type="text" class="form-control" name="cvv" id="cvv" pattern="\d{3,4}" maxlength="4" minlength="3" placeholder="123" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="amount" class="form-label">
+                                        <i class="fas fa-dollar-sign me-2"></i>Monto
+                                    </label>
+                                    <input type="number" step="0.01" class="form-control" name="amount" id="amount" min="0" placeholder="50.00" value="50.00" required>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="currency" class="form-label">
+                                        <i class="fas fa-coins me-2"></i>Moneda
+                                    </label>
+                                    <select class="form-select" name="currency" id="currency" required>
+                                        <option value="USD" selected>USD - Dólar Estadounidense</option>
+                                        <option value="EUR">EUR - Euro</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="description" class="form-label">
+                                        <i class="fas fa-file-alt me-2"></i>Descripción
+                                    </label>
+                                    <input type="text" class="form-control" name="description" id="description" maxlength="100" minlength="2" placeholder="Pago por tutoría de matemáticas" value="Pago por servicios de tutoría" required>
+                                </div>
+
+                                <div class="col-12">
+                                    <label for="reference" class="form-label">
+                                        <i class="fas fa-hashtag me-2"></i>Referencia
+                                    </label>
+                                    <input type="text" class="form-control" name="reference" id="reference" maxlength="100" minlength="2" placeholder="REF-001" value="TEST-REF-001" required>
+                                </div>
+
+                                <div class="col-12 text-center">
+                                    <div class="g-recaptcha" data-sitekey="<%= grKey %>"></div>
+                                </div>
+
+                                <div class="col-12 text-center">
+                                    <button type="submit" class="btn btn-gradient btn-lg">
+                                        <i class="fas fa-credit-card me-2"></i>Procesar Pago
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <% } %>
+
+    </div>
+</main>
+    
+<!-- Footer -->
+<footer class="bg-dark text-white py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <h5 class="fw-bold mb-3">
+                    <i class="fas fa-graduation-cap me-2"></i>TutorNest
+                </h5>
+                <p class="text-light">Transformando la educación a través de tutorías personalizadas y metodologías innovadoras.</p>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <h6 class="fw-bold mb-3">Enlaces Rápidos</h6>
+                <ul class="list-unstyled">
+                    <li><a href="#descripcion" class="text-light text-decoration-none">Servicios</a></li>
+                    <li><a href="#beneficios" class="text-light text-decoration-none">Beneficios</a></li>
+                    <li><a href="#contacto" class="text-light text-decoration-none">Contacto</a></li>
+                    <% if (showPaymentForm) { %>
+                    <li><a href="#payment" class="text-light text-decoration-none">Realizar Pago</a></li>
+                    <% } %>
+                </ul>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <h6 class="fw-bold mb-3">Síguenos</h6>
+                <div class="d-flex gap-3">
+                    <a href="#" class="text-light fs-4"><i class="fab fa-facebook"></i></a>
+                    <a href="#" class="text-light fs-4"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="text-light fs-4"><i class="fab fa-twitter"></i></a>
+                    <a href="#" class="text-light fs-4"><i class="fab fa-linkedin"></i></a>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <p class="mb-0">&copy; 2025 TutorNest - Clases Particulares. Todos los derechos reservados.</p>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <small class="text-muted">Desarrollado con <i class="fas fa-heart text-danger"></i> para la educación</small>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Auto-fill example data for testing
+    document.addEventListener('DOMContentLoaded', function() {
+        const paymentForm = document.getElementById('payment-form');
+        if (paymentForm) {
+            // Add click handler for auto-fill example data
+            const cardNumberInput = document.getElementById('cardNumber');
+            const cvvInput = document.getElementById('cvv');
+            const cardholderInput = document.getElementById('cardholderName');
+            const emailInput = document.getElementById('payment-email');
+            
+            // Format card number input
+            cardNumberInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
+                let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+                if (formattedValue !== e.target.value) {
+                    e.target.value = formattedValue;
+                }
+            });
+            
+            // Add example data button
+            const exampleBtn = document.createElement('button');
+            exampleBtn.type = 'button';
+            exampleBtn.className = 'btn btn-outline-secondary btn-sm mt-2';
+            exampleBtn.innerHTML = '<i class="fas fa-magic me-1"></i>Llenar con datos de ejemplo';
+            exampleBtn.onclick = function() {
+                document.getElementById('payment-email').value = 'test@example.com';
+                document.getElementById('cardholderName').value = 'APPROVED'; // Nombre que aprueba el pago
+                document.getElementById('cardNumber').value = '4111111111111111'; // Visa válida sin espacios
+                document.getElementById('cvv').value = '123';
+                document.getElementById('amount').value = '50.00';
+                document.getElementById('description').value = 'Pago por servicios de tutoría';
+                document.getElementById('reference').value = 'TEST-REF-001';
+            };
+            
+            // Insert button after card number field
+            cardNumberInput.parentNode.appendChild(exampleBtn);
+        }
+        
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    });
+</script>
+</body>
+</html>

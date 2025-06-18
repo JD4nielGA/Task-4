@@ -1,0 +1,53 @@
+{
+  "name": "programacion2",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "node dist/bin/www.js",
+    "dev": "nodemon --watch src --ext ts,ejs --exec ts-node src/bin/www.ts",
+    "build": "tsc && xcopy src\\views dist\\views /E /I /Y && xcopy src\\public dist\\public /E /I /Y",
+    "build:linux": "node build-linux.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@stripe/stripe-js": "^7.3.0",
+    "@types/bcrypt": "^5.0.2",
+    "@types/passport": "^1.0.17",
+    "@types/passport-google-oauth20": "^2.0.16",
+    "axios": "^1.9.0",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "~1.4.4",
+    "debug": "~2.6.9",
+    "dotenv": "^16.5.0",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "express-session": "^1.18.1",
+    "http-errors": "~1.6.3",
+    "mercadopago": "^2.5.0",
+    "morgan": "~1.9.1",
+    "nodemailer": "^7.0.3",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "paypal-checkout": "^4.0.344",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.8",
+    "@types/ejs": "^3.1.5",
+    "@types/express": "^5.0.1",
+    "@types/express-session": "^1.18.1",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.15.2",
+    "@types/nodemailer": "^6.4.17",
+    "copyfiles": "^2.4.1",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
