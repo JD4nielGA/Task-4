@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node dist/bin/www.js",
     "dev": "nodemon --watch src --ext ts,ejs --exec ts-node src/bin/www.ts",
-    "build": "tsc && xcopy src\\views dist\\views /E /I /Y && xcopy src\\public dist\\public /E /I /Y",
+    "build": "tsc && node build-linux.js",
     "build:linux": "node build-linux.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
